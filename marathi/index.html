@@ -102,6 +102,9 @@
           </div>
 
           <aside class="hero-panel">
+            <!-- The two shots cross-fade on a CSS-only 6s loop, 3s each. The
+                 second is decorative: it is the same person, so announcing it
+                 again would only repeat the first one's alt text. -->
             <div class="photo-card">
               <img
                 class="profile-photo"
@@ -109,10 +112,22 @@
                 srcset="../assets/Biodata_Image-560.jpg 560w, ../assets/Biodata_Image.jpg 890w"
                 sizes="(max-width: 700px) 62vw, 280px"
                 width="890"
-                height="1321"
+                height="1184"
                 alt="यश लोटके"
                 loading="eager"
                 fetchpriority="high"
+                decoding="async"
+              />
+              <img
+                class="profile-photo"
+                src="../assets/Biodata_Image_1-560.jpg"
+                srcset="../assets/Biodata_Image_1-560.jpg 560w, ../assets/Biodata_Image_1.jpg 890w"
+                sizes="(max-width: 700px) 62vw, 280px"
+                width="890"
+                height="1184"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
                 decoding="async"
               />
             </div>

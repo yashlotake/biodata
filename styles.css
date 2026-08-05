@@ -414,8 +414,11 @@ main {
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
-  display: flex;
-  justify-content: center;
+  /* Both shots share one grid cell so they stack for the cross-fade. Unlike
+     absolute positioning this still contributes to the card's intrinsic size,
+     so `fit-content` above resolves to the photo rather than collapsing. */
+  display: grid;
+  justify-items: center;
   position: relative;
 }
 
@@ -431,22 +434,62 @@ main {
 
 .profile-photo {
   /* Height is pinned to what the old 4/5 box occupied, so the hero keeps its
-     original proportions. The ratio then matches the source's own 890x1321,
-     which leaves `cover` nothing to trim — the whole portrait shows, and the
-     image simply sits narrower than the panel rather than being cut to fill it.
-     Keep the ratio in step with the image file: drift is what starts cropping. */
+     original proportions. Both files are cut to 890x1184, so one ratio serves
+     every slide, `cover` has nothing to trim, and the frame is identical from
+     shot to shot. Keep new photos to that ratio — pad rather than crop them,
+     the way the studio shot's own grey backdrop was extended sideways. */
   height: calc(var(--photo-w) * 1.25);
   width: auto;
   max-width: 100%;
   margin: 0 auto;
-  aspect-ratio: 890 / 1321;
+  aspect-ratio: 890 / 1184;
+  grid-area: 1 / 1;
   object-fit: cover;
   object-position: center;
   border-radius: var(--radius-lg);
   box-shadow: 0 14px 34px rgba(9, 19, 45, 0.35);
-  -webkit-mask-image: radial-gradient(125% 125% at 50% 50%, #000 64%, rgba(0, 0, 0, 0.9) 78%, rgba(0, 0, 0, 0.5) 91%, transparent 100%);
-  mask-image: radial-gradient(125% 125% at 50% 50%, #000 64%, rgba(0, 0, 0, 0.9) 78%, rgba(0, 0, 0, 0.5) 91%, transparent 100%);
+  /* No soft-edge mask here on purpose: the studio shot's light grey backdrop
+     dissolved into the navy hero at the edges and read as a washed-out white
+     halo. A clean rounded edge keeps the backdrop looking deliberate. */
   display: block;
+  animation: photo-cycle 6s ease-in-out infinite;
+}
+
+.profile-photo:nth-of-type(1) {
+  /* Base state, not just a starting frame: it is what shows when the animation
+     is off (reduced motion, print, no support) — see the overrides below. */
+  opacity: 1;
+}
+
+.profile-photo:nth-of-type(2) {
+  opacity: 0;
+  /* Negative delay starts it half a cycle in, so it is already mid-gap when the
+     first slide is showing — no blank beat before the first hand-off. */
+  animation-delay: -3s;
+}
+
+/* 3s held per shot out of a 6s loop, with the hand-off inside the last ~0.4s so
+   the cross-fade reads as a dissolve rather than a blink. */
+@keyframes photo-cycle {
+  0%,
+  43% {
+    opacity: 1;
+  }
+  50%,
+  93% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Motion is decorative here — the biodata reads identically on one photo, so
+   honour the request to stop it and just hold the first shot. */
+@media (prefers-reduced-motion: reduce) {
+  .profile-photo {
+    animation: none;
+  }
 }
 
 .section-head h2,
@@ -799,13 +842,15 @@ main {
     display: none;
   }
 
-  /* Print rasterises the soft-edge mask as a dither pattern, which shows up as
-     visible speckling over the photo. Hard edges reproduce cleanly on paper. */
+  /* A drop shadow only muddies the photo's edge on paper; a hairline reads as
+     the intended frame instead. */
   .profile-photo {
-    -webkit-mask-image: none;
-    mask-image: none;
     box-shadow: none;
     border: 1px solid #cbd5e1;
+    /* Paper cannot rotate, and without this the print lands on whatever frame
+       the loop happened to be on — including a half-faded one. Stopping the
+       animation falls back to the base opacities, so slide 1 always prints. */
+    animation: none;
   }
 
   /* Tap targets are meaningless on paper and only add vertical bloat. */
