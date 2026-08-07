@@ -214,6 +214,18 @@ img {
   text-align: center;
 }
 
+/* Give the line the whole row, so the centring is done by `text-align` on each
+   line rather than by however flexbox distributes the leftover space. The two
+   part company as soon as the text wraps — which it does at iPhone widths,
+   where the invocation runs to two lines and the bar was left looking
+   off-centre. `min-width: 0` is the other half: without it a flex item refuses
+   to shrink below its longest word, so on a narrow screen the line overflowed
+   the bar to the right instead of wrapping inside it. */
+.topbar-invocation .brand {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
 .topbar :focus-visible,
 .hero :focus-visible {
   outline-color: #ffffff;
