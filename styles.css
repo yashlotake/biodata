@@ -186,10 +186,13 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* The bar holds exactly two things — the brand and the language switch — and
-     the switch must stay pinned to the right corner at every width, so nothing
-     is allowed to wrap onto a second row. */
-  flex-wrap: nowrap;
+  /* Was nowrap back when the bar held only the brand and the language switch.
+     With the PDF button beside the switch the three no longer fit a 320px
+     phone, and nowrap does not fail gracefully: flexbox crushes the pills into
+     the brand until the text overlaps. Wrapping only engages when the row
+     genuinely runs out of width, so wide screens are untouched and a narrow one
+     drops the pills onto their own right-aligned second row. */
+  flex-wrap: wrap;
   gap: 0.7rem;
   margin-bottom: 0.85rem;
   padding: 0.72rem 0.85rem;
@@ -202,6 +205,13 @@ img {
 
 .topbar .brand {
   color: #f2f7ff;
+}
+
+/* The invocation bar carries one line and no switch, so the two-item
+   space-between layout has nothing to push apart — centre it instead. */
+.topbar-invocation {
+  justify-content: center;
+  text-align: center;
 }
 
 .topbar :focus-visible,
@@ -278,6 +288,26 @@ img {
   white-space: nowrap;
   border-color: rgba(214, 229, 250, 0.4);
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* Carries .lang-switch for the pill itself, so background, border, radius,
+   padding, height and hover/active states all come from the same place as the
+   language switch. What is left here is the type: a <button> takes none of the
+   page's font from its ancestors — every browser substitutes its own UI face at
+   its own size — and brings a UA background and border of its own. Restating
+   the four type properties and switching the appearance off is what makes the
+   two pills indistinguishable rather than merely similar. It stays a button,
+   not a link, because it triggers an action instead of navigating. Hidden in
+   print along with the rest of the nav. */
+.print-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 main {
@@ -798,19 +828,140 @@ main {
 
 /* Printing / "Save as PDF" — many browsers omit background colors by default,
    which would leave the navy hero/topbar text unreadable (white-on-white).
-   Force high-contrast dark-on-light everywhere and drop decorative chrome. */
+   Force high-contrast dark-on-light everywhere and drop decorative chrome.
+   The whole biodata is also squeezed onto a single A4 sheet: a biodata that
+   arrives as two pages gets printed, stapled and read as two halves. */
 @media print {
+  /* Fixed rather than left to the browser's paper default: the compaction
+     below is tuned to this page box, and a Letter sheet is 18mm shorter. */
+  @page {
+    size: A4 portrait;
+    margin: 8mm 9mm;
+  }
+
+  /* Every size on the page is rem-based, so the root size is the one knob that
+     scales the entire document. Set only in print — on screen this would
+     override the reader's own browser font-size setting, which is why `html`
+     deliberately carries no font-size at the top of this file.
+     The exceptions are the two px/vw values below, retuned by hand.
+     Sized to fill the sheet rather than leave a blank foot: measured against
+     both languages, 12.2px still fits and 12.4px tips the English page onto a
+     second sheet, so this sits one notch under the cliff. Adding a row or a
+     longer value spends that margin — re-check both PDFs after. */
+  html {
+    font-size: 12px;
+  }
+
+  :root {
+    /* Scales with the root size above, near enough to 15.8x it. */
+    --photo-w: 190px;
+    --pad-x: 1rem;
+    --title-gap: 0.45rem;
+  }
+
+  .page-wrap {
+    padding: 0;
+  }
+
+  /* The page box is ~192mm ≈ 726px, close enough to the 700px phone breakpoint
+     that the hero would stack or not depending on how a given browser rounds
+     mm to px. Pinned here so the PDF is the same document everywhere. */
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 0.6rem var(--pad-x);
+  }
+
+  .hero-panel {
+    order: 0;
+    width: var(--photo-w);
+  }
+
+  .hero h1 {
+    font-size: 1.95rem;
+    text-align: left;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: start;
+    max-width: none;
+    column-gap: 1.4rem;
+    row-gap: 0.5rem;
+    margin: var(--title-gap) 0 0.2rem;
+  }
+
+  .hero-stats > div {
+    gap: 0.1rem;
+  }
+
+  main {
+    gap: 0.42rem;
+  }
+
+  .topbar {
+    margin-bottom: 0.42rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .section {
+    padding: 0.45rem var(--pad-x);
+  }
+
+  .section-head h2,
+  .split h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.3rem;
+  }
+
+  .split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem;
+  }
+
+  .detail-row {
+    padding: 0.26rem 0.5rem;
+    gap: 0.6rem;
+  }
+
+  .detail-value-multi {
+    gap: 0.28rem;
+  }
+
   .orb,
   .skip-link {
     display: none;
   }
 
+  /* The sheet itself stays white — the page's blue wash is screen ambience and
+     only makes the PDF look like a screenshot. */
   body {
     background: #ffffff;
   }
 
+  /* The three blocks at the top — both bars and the hero — keep the site's navy
+     and the type colours that belong to it: white brand, white name and values,
+     gold labels. Those colours need no rules here; they come from the page once
+     the overrides that used to flatten them are gone. What they do need is
+     `print-color-adjust: exact`, or the browser's ink-saving pass drops the
+     navy and leaves white text on white paper. It inherits, so one declaration
+     covers each block's contents. */
   .topbar,
-  .hero,
+  .hero {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    /* Chrome rasterises drop shadows into a PDF in tiles and leaves a pale band
+       under the panel where they fail to meet; the bar's backdrop blur has
+       nothing to sample once the page is flattened and bands it the same way.
+       Both are lift effects for a page that scrolls, so a flat sheet loses
+       nothing by dropping them. */
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  /* Everything below the hero stays dark-on-light, which is what the cards very
+     nearly are on screen anyway. */
   .section {
     background: #ffffff;
     box-shadow: none;
@@ -823,30 +974,19 @@ main {
     display: none;
   }
 
-  .hero::before,
+  /* Draws the curve that blends the hero into the page, painted in --bg. The
+     sheet is white here, so it would land as a blue smear under the hero. */
   .hero::after {
     display: none;
-  }
-
-  .topbar .brand,
-  .hero h1,
-  .hero-stats-value {
-    color: var(--text-strong);
-  }
-
-  .hero-stats-label {
-    color: var(--accent-ink);
   }
 
   .photo-card::after {
     display: none;
   }
 
-  /* A drop shadow only muddies the photo's edge on paper; a hairline reads as
-     the intended frame instead. */
   .profile-photo {
+    /* Same tiling artefact as the panels above. */
     box-shadow: none;
-    border: 1px solid #cbd5e1;
     /* Paper cannot rotate, and without this the print lands on whatever frame
        the loop happened to be on — including a half-faded one. Stopping the
        animation falls back to the base opacities, so slide 1 always prints. */
@@ -859,13 +999,21 @@ main {
     color: var(--text-strong);
   }
 
-  a[target="_blank"]::after {
-    content: " (" attr(href) ")";
-    font-weight: 400;
-    font-size: 0.85em;
-    color: var(--muted);
+  /* The two "Click here" links — company site and Google Maps — are screen
+     controls: a sheet of paper cannot follow them, and the row above each one
+     already carries the company name and the full postal address in text. The
+     rule that used to print the raw URL after them goes too; the maps link
+     alone ran to ~90 characters and wrapped onto two lines. Phone numbers are
+     left alone: those are tel: links whose text is the information itself. */
+  a[target="_blank"] {
+    display: none;
   }
 
+  /* Belt and braces: the compaction above is what makes one page fit, this is
+     what keeps a card from being sliced in half if a longer value ever pushes
+     the content past the sheet. */
+  .hero,
+  .section,
   .detail-row,
   article {
     break-inside: avoid;

@@ -54,11 +54,20 @@
     <a class="skip-link" href="#profile">बायोडेटावर जा</a>
 
     <div class="page-wrap">
+      <!-- Family deities' invocation. A plain div, not a second <header>: two
+           headers side by side would expose two banner landmarks. -->
+      <div class="topbar topbar-invocation">
+        <p class="brand">॥ श्री दरगोबा प्रसन्न ॥ श्री चौंडेश्वरी प्रसन्न ॥</p>
+      </div>
       <header class="topbar">
         <div class="brand-block">
           <p class="brand">बायोडेटा</p>
         </div>
         <nav aria-label="Primary">
+          <!-- Wears the same pill as the language switch beside it. A label this
+               long no longer fits one row on a 320px phone, which is why the bar
+               wraps (see .topbar) and the two pills drop to a second row there. -->
+          <button class="lang-switch print-btn" type="button" data-print-page>बायोडेटा PDF डाउनलोड करा</button>
           <a class="lang-switch" href="../english/index.html" lang="en" hreflang="en">English</a>
         </nav>
       </header>
@@ -66,7 +75,7 @@
       <main>
         <section class="hero" id="profile" aria-labelledby="profile-heading">
           <div class="hero-content">
-            <h1 id="profile-heading">चि. यश लोटके</h1>
+            <h1 id="profile-heading">चि. यश श्रीराम लोटके</h1>
             <dl class="hero-stats">
               <div>
                 <dt class="hero-stats-label">जन्मतारीख</dt>
@@ -145,12 +154,12 @@
             </div>
             <div class="detail-row">
               <dt class="detail-key">नोकरीचे वर्णन</dt>
-              <dd class="detail-value">अ‍ॅग्रोस्टार <span lang="en">COCO (Company Owned Company Operated)</span> स्टोअर इन्चार्ज</dd>
+              <dd class="detail-value">अ‍ॅग्रोस्टार <span lang="en">COCO (Company Owned Company Operated)</span> ऑफिस इन्चार्ज, मंचर, पुणे</dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">कंपनीचे नाव</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>अ‍ॅग्रोस्टार</span>
+                <span>अ‍ॅग्रोस्टार, पुणे</span>
                 <a href="https://corporate.agrostar.in/" target="_blank" rel="noopener noreferrer">कंपनीचा तपशील पाहण्यासाठी येथे क्लिक करा</a>
               </dd>
             </div>
@@ -165,20 +174,20 @@
             <div class="detail-row">
               <dt class="detail-key">आजोबा (वडिलांकडील)</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>स्व. उत्तम विष्णुपंत लोटके (विटा)</span>
+                <span>स्व. उत्तम विष्णुपंत लोटके (विटा, सांगली)</span>
               </dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">आजोबा (आईकडील)</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>स्व. हरिभाऊ गणपतराव बागडे (भूम)</span>
+                <span>स्व. हरिभाऊ गणपतराव बागडे (भूम, उस्मानाबाद)</span>
               </dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">आई-वडील</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>श्री. श्रीराम उत्तम लोटके</span>
+                  <span>श्री. श्रीराम उत्तम लोटके (विटा, सांगली)</span>
                   <span><a href="tel:+917588058806" lang="en">+91 75880 58806</a></span>
                 </div>
                 <div class="detail-value-stacked">
@@ -190,7 +199,7 @@
               <dt class="detail-key">काका आणि काकू</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>श्री. किशोर उत्तम लोटके</span>
+                  <span>श्री. किशोर उत्तम लोटके (सांगली)</span>
                   <span><a href="tel:+917588628120" lang="en">+91 75886 28120</a></span>
                 </div>
                 <div class="detail-value-stacked">
@@ -205,7 +214,7 @@
               <dt class="detail-key">मामा</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>श्री. गजानन हरिभाऊ बागडे</span>
+                  <span>श्री. गजानन हरिभाऊ बागडे (भूम, उस्मानाबाद)</span>
                   <span><a href="tel:+919850202199" lang="en">+91 98502 02199</a></span>
                 </div>
               </dd>
@@ -214,7 +223,7 @@
               <dt class="detail-key">भावंडे</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>श्री. केतन श्रीराम लोटके</span>
+                  <span>श्री. केतन श्रीराम लोटके (टोकियो, जपान)</span>
                 </div>
                 <div class="detail-value-stacked">
                   <span>पत्नी : सौ. निकिता केतन लोटके</span>
@@ -267,5 +276,32 @@
         </section>
       </main>
     </div>
+
+    <!-- The PDF button. window.print() hands the page to the browser's own
+         print-to-PDF engine, so the @media print rules in styles.css are what
+         shape the file — no library, no server, and the output cannot drift
+         from the page. Wired up here rather than with an onclick attribute so
+         the button is inert if this never runs, instead of offering a download
+         that fails. -->
+    <script>
+      // Every browser seeds the "Save as PDF" filename from document.title, and
+      // nothing else can set it — so the title is swapped for the length of the
+      // print call. Restored on afterprint rather than on the next line because
+      // Safari returns from print() before the dialog is dismissed, which would
+      // put the old title back in time for the save.
+      // Devanagari, to match the page it comes from. Underscores rather than
+      // spaces so the name survives being passed around as a link or attachment.
+      var pdfName = "यश_श्रीराम_लोटके_बायोडेटा(मराठी)";
+      var pageTitle = document.title;
+
+      document.querySelector("[data-print-page]").addEventListener("click", function () {
+        document.title = pdfName;
+        window.print();
+      });
+
+      window.addEventListener("afterprint", function () {
+        document.title = pageTitle;
+      });
+    </script>
   </body>
 </html>

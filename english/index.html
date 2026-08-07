@@ -55,11 +55,20 @@
     <a class="skip-link" href="#profile">Skip to biodata</a>
 
     <div class="page-wrap">
+      <!-- Family deities' invocation. A plain div, not a second <header>: two
+           headers side by side would expose two banner landmarks. -->
+      <div class="topbar topbar-invocation">
+        <p class="brand">|| Shree Dargoba Blessings || Shree Chaundeshwari Blessings ||</p>
+      </div>
       <header class="topbar">
         <div class="brand-block">
           <p class="brand">Biodata</p>
         </div>
         <nav aria-label="Primary">
+          <!-- Wears the same pill as the language switch beside it. A label this
+               long no longer fits one row on a 320px phone, which is why the bar
+               wraps (see .topbar) and the two pills drop to a second row there. -->
+          <button class="lang-switch print-btn" type="button" data-print-page>Download Biodata PDF</button>
           <a class="lang-switch" href="../marathi/index.html" lang="mr" hreflang="mr">मराठी</a>
         </nav>
       </header>
@@ -67,7 +76,7 @@
       <main>
         <section class="hero" id="profile" aria-labelledby="profile-heading">
           <div class="hero-content">
-            <h1 id="profile-heading">Yash Lotake</h1>
+            <h1 id="profile-heading">Yash Shriram Lotake</h1>
             <dl class="hero-stats">
               <div>
                 <dt class="hero-stats-label">Date of Birth</dt>
@@ -146,12 +155,12 @@
             </div>
             <div class="detail-row">
               <dt class="detail-key">Job Description</dt>
-              <dd class="detail-value">AgroStar COCO (Company Owned Company Operated) Store In Charge</dd>
+              <dd class="detail-value">AgroStar COCO (Company Owned Company Operated) Office In Charge, Manchar, Pune</dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">Company Name</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>AgroStar</span>
+                <span>AgroStar, Pune</span>
                 <a href="https://corporate.agrostar.in/" target="_blank" rel="noopener noreferrer">Click here to check company details</a>
               </dd>
             </div>
@@ -166,20 +175,20 @@
             <div class="detail-row">
               <dt class="detail-key">Paternal Grandfather</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>Late Uttam Vishnupant Lotake (Vita)</span>
+                <span>Late Uttam Vishnupant Lotake (Vita, Sangli)</span>
               </dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">Maternal Grandfather</dt>
               <dd class="detail-value detail-value-stacked">
-                <span>Late Haribhau Ganpatrao Bagade (Bhoom)</span>
+                <span>Late Haribhau Ganpatrao Bagade (Bhoom, Osmanabad)</span>
               </dd>
             </div>
             <div class="detail-row">
               <dt class="detail-key">Parents</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>Shriram Uttam Lotake</span>
+                  <span>Shriram Uttam Lotake (Vita, Sangli)</span>
                   <span><a href="tel:+917588058806">+91 75880 58806</a></span>
                 </div>
                 <div class="detail-value-stacked">
@@ -191,7 +200,7 @@
               <dt class="detail-key">Paternal Uncle and Aunt</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>Kishor Uttam Lotake</span>
+                  <span>Kishor Uttam Lotake (Sangli)</span>
                   <span><a href="tel:+917588628120">+91 75886 28120</a></span>
                 </div>
                 <div class="detail-value-stacked">
@@ -206,7 +215,7 @@
               <dt class="detail-key">Maternal Uncle</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>Gajanan Haribhau Bagade</span>
+                  <span>Gajanan Haribhau Bagade (Bhoom, Osmanabad)</span>
                   <span><a href="tel:+919850202199">+91 98502 02199</a></span>
                 </div>
               </dd>
@@ -215,7 +224,7 @@
               <dt class="detail-key">Siblings</dt>
               <dd class="detail-value detail-value-multi">
                 <div class="detail-value-stacked">
-                  <span>Ketan Shriram Lotake</span>
+                  <span>Ketan Shriram Lotake (Tokyo, Japan)</span>
                 </div>
                 <div class="detail-value-stacked">
                   <span>Wife : Nikita Ketan Lotake</span>
@@ -268,5 +277,30 @@
         </section>
       </main>
     </div>
+
+    <!-- The PDF button. window.print() hands the page to the browser's own
+         print-to-PDF engine, so the @media print rules in styles.css are what
+         shape the file — no library, no server, and the output cannot drift
+         from the page. Wired up here rather than with an onclick attribute so
+         the button is inert if this never runs, instead of offering a download
+         that fails. -->
+    <script>
+      // Every browser seeds the "Save as PDF" filename from document.title, and
+      // nothing else can set it — so the title is swapped for the length of the
+      // print call. Restored on afterprint rather than on the next line because
+      // Safari returns from print() before the dialog is dismissed, which would
+      // put the old title back in time for the save.
+      var pdfName = "Yash_Shriram_Lotake_Biodata(English)";
+      var pageTitle = document.title;
+
+      document.querySelector("[data-print-page]").addEventListener("click", function () {
+        document.title = pdfName;
+        window.print();
+      });
+
+      window.addEventListener("afterprint", function () {
+        document.title = pageTitle;
+      });
+    </script>
   </body>
 </html>
