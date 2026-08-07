@@ -72,6 +72,18 @@
         </nav>
       </header>
 
+      <!-- Shown only where the button cannot work: Chrome, Firefox and Edge on
+           iPhone are all Safari's engine in a different wrapper, and none of
+           them implement window.print(), so the tap would otherwise do nothing
+           at all. Hidden by default so it never appears where printing works. -->
+      <p class="print-hint" id="print-hint" hidden>
+        या ब्राउझरमध्ये पेज थेट PDF म्हणून जतन करता येत नाही. हे पेज
+        <strong lang="en">Safari</strong> मध्ये उघडा आणि पुन्हा बटण दाबा — किंवा या
+        ब्राउझरच्या <strong lang="en">Share</strong> मेनूमधून
+        <strong lang="en">Print</strong> निवडा आणि नंतर
+        <strong lang="en">Save to Files</strong> वापरा.
+      </p>
+
       <main>
         <section class="hero" id="profile" aria-labelledby="profile-heading">
           <div class="hero-content">
@@ -294,7 +306,19 @@
       var pdfName = "यश_श्रीराम_लोटके_बायोडेटा(मराठी)";
       var pageTitle = document.title;
 
+      // Every browser on iPhone and iPad is Safari's engine in someone else's
+      // wrapper, and only Safari itself wires window.print() up to the print
+      // sheet. In Chrome, Firefox and Edge there the function exists but does
+      // nothing, so a feature test cannot catch it — the wrapper has to be named.
+      // Everywhere else, including Chrome on Android, printing works.
+      var iosWrapper = /CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(navigator.userAgent);
+
       document.querySelector("[data-print-page]").addEventListener("click", function () {
+        if (iosWrapper || typeof window.print !== "function") {
+          // Say so, rather than leaving a button that swallows the tap.
+          document.getElementById("print-hint").hidden = false;
+          return;
+        }
         document.title = pdfName;
         window.print();
       });

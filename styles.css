@@ -95,7 +95,11 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   /* `clip` rather than `hidden`: it contains the blurred orbs without turning
-     the body into a scroll container, so `position: sticky` keeps working. */
+     the body into a scroll container, so `position: sticky` keeps working.
+     `hidden` first as the fallback — engines that predate `clip` (Safari 15 and
+     earlier, so iPhones a couple of iOS versions back) drop the line they do not
+     understand and keep this one, which contains the orbs just as well. */
+  overflow-x: hidden;
   overflow-x: clip;
 }
 
@@ -200,6 +204,9 @@ img {
   border: 1px solid var(--navy-line);
   background: linear-gradient(135deg, var(--navy-topbar-1) 0%, var(--navy-topbar-2) 58%, var(--navy-topbar-3) 100%);
   box-shadow: var(--shadow-navy);
+  /* Prefixed first: Safari on both macOS and iOS still ships this only behind
+     -webkit-, so without it the bar loses the blur on every Apple device. */
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 
@@ -224,6 +231,26 @@ img {
 .topbar-invocation .brand {
   flex: 1 1 100%;
   min-width: 0;
+}
+
+/* Only ever visible after a tap the browser could not honour, so it is styled as
+   a quiet note rather than an alert — nothing has gone wrong, the reader just
+   needs a different route to the same file. Sits directly under the bar holding
+   the button it explains. */
+.print-hint {
+  margin: -0.35rem 0 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.print-hint strong {
+  color: var(--text-strong);
 }
 
 .topbar :focus-visible,
@@ -942,7 +969,9 @@ main {
   }
 
   .orb,
-  .skip-link {
+  .skip-link,
+  /* Instructions for saving the file have no place inside the file. */
+  .print-hint {
     display: none;
   }
 
@@ -969,6 +998,8 @@ main {
        Both are lift effects for a page that scrolls, so a flat sheet loses
        nothing by dropping them. */
     box-shadow: none;
+    /* Both spellings, or Safari keeps the prefixed blur it applied on screen. */
+    -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
@@ -1028,6 +1059,9 @@ main {
   .section,
   .detail-row,
   article {
+    /* Legacy name first: Safari's print path honours only `page-break-inside`,
+       so on macOS and iOS this is the one doing the work. */
+    page-break-inside: avoid;
     break-inside: avoid;
   }
 }

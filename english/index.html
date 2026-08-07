@@ -73,6 +73,17 @@
         </nav>
       </header>
 
+      <!-- Shown only where the button cannot work: Chrome, Firefox and Edge on
+           iPhone are all Safari's engine in a different wrapper, and none of
+           them implement window.print(), so the tap would otherwise do nothing
+           at all. Hidden by default so it never appears where printing works. -->
+      <p class="print-hint" id="print-hint" hidden>
+        This browser can’t save the page as a PDF. Open the page in
+        <strong>Safari</strong> and tap the button again — or use this browser’s
+        <strong>Share</strong> menu, choose <strong>Print</strong>, then share the
+        preview to <strong>Save to Files</strong>.
+      </p>
+
       <main>
         <section class="hero" id="profile" aria-labelledby="profile-heading">
           <div class="hero-content">
@@ -293,7 +304,19 @@
       var pdfName = "Yash_Shriram_Lotake_Biodata(English)";
       var pageTitle = document.title;
 
+      // Every browser on iPhone and iPad is Safari's engine in someone else's
+      // wrapper, and only Safari itself wires window.print() up to the print
+      // sheet. In Chrome, Firefox and Edge there the function exists but does
+      // nothing, so a feature test cannot catch it — the wrapper has to be named.
+      // Everywhere else, including Chrome on Android, printing works.
+      var iosWrapper = /CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(navigator.userAgent);
+
       document.querySelector("[data-print-page]").addEventListener("click", function () {
+        if (iosWrapper || typeof window.print !== "function") {
+          // Say so, rather than leaving a button that swallows the tap.
+          document.getElementById("print-hint").hidden = false;
+          return;
+        }
         document.title = pdfName;
         window.print();
       });
