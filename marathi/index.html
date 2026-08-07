@@ -72,16 +72,14 @@
         </nav>
       </header>
 
-      <!-- Shown only where the button cannot work: Chrome, Firefox and Edge on
-           iPhone are all Safari's engine in a different wrapper, and none of
-           them implement window.print(), so the tap would otherwise do nothing
-           at all. Hidden by default so it never appears where printing works. -->
+      <!-- Shown in place of the download on browsers that cannot produce the
+           file correctly. Hidden by default, so it never appears where the
+           button works. -->
       <p class="print-hint" id="print-hint" hidden>
-        या ब्राउझरमध्ये पेज थेट PDF म्हणून जतन करता येत नाही. हे पेज
-        <strong lang="en">Safari</strong> मध्ये उघडा आणि पुन्हा बटण दाबा — किंवा या
-        ब्राउझरच्या <strong lang="en">Share</strong> मेनूमधून
-        <strong lang="en">Print</strong> निवडा आणि नंतर
-        <strong lang="en">Save to Files</strong> वापरा.
+        या ब्राउझरमध्ये एक-पानी PDF योग्य प्रकारे तयार होत नाही. हे पेज संगणकावर किंवा
+        <strong lang="en">Android</strong> फोनवर <strong lang="en">Chrome</strong>,
+        <strong lang="en">Edge</strong> किंवा <strong lang="en">Firefox</strong>
+        मध्ये उघडा आणि तिथे बटण दाबा.
       </p>
 
       <main>
@@ -306,16 +304,20 @@
       var pdfName = "यश_श्रीराम_लोटके_बायोडेटा(मराठी)";
       var pageTitle = document.title;
 
-      // Every browser on iPhone and iPad is Safari's engine in someone else's
-      // wrapper, and only Safari itself wires window.print() up to the print
-      // sheet. In Chrome, Firefox and Edge there the function exists but does
-      // nothing, so a feature test cannot catch it — the wrapper has to be named.
-      // Everywhere else, including Chrome on Android, printing works.
-      var iosWrapper = /CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(navigator.userAgent);
+      // The one-page layout depends on @page — the A4 size and the margins it
+      // is measured against. Chromium and Firefox honour it; Safari ignores it
+      // and prints on whatever paper the system is set to, at its own margins,
+      // which spills the biodata onto a second sheet. That covers every browser
+      // on iPhone and iPad too: they are all Safari in a different wrapper, and
+      // the ones that are not Safari do not implement window.print() at all.
+      // So the button is offered only where the file comes out right.
+      var ua = navigator.userAgent;
+      var isApple =
+        /iPhone|iPad|iPod/.test(ua) ||
+        (/Safari/.test(ua) && !/Chrome|Chromium|Android|CriOS|FxiOS|EdgiOS/.test(ua));
 
       document.querySelector("[data-print-page]").addEventListener("click", function () {
-        if (iosWrapper || typeof window.print !== "function") {
-          // Say so, rather than leaving a button that swallows the tap.
+        if (isApple) {
           document.getElementById("print-hint").hidden = false;
           return;
         }
