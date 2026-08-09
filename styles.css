@@ -502,16 +502,18 @@ main {
 }
 
 .profile-photo {
-  /* Height is pinned to what the old 4/5 box occupied, so the hero keeps its
-     original proportions. Both files are cut to 890x1184, so one ratio serves
-     every slide, `cover` has nothing to trim, and the frame is identical from
-     shot to shot. Keep new photos to that ratio — pad rather than crop them,
-     the way the studio shot's own grey backdrop was extended sideways. */
-  height: calc(var(--photo-w) * 1.25);
+  /* One box is imposed on both slides so the frame never shifts between shots.
+     2/3 is the ratio the photos themselves are near — 890x1321 and 752x1142 sit
+     within ~1% either side of it — so `cover` has almost nothing to trim and
+     neither shot needs its own `object-position`. Keep new photos to roughly
+     that shape; a squarer one would get cropped top and bottom to fit.
+     The 1.41 multiplier is what holds the rendered width at the ~263px the old
+     4/5 box occupied, so the hero's two columns keep their original balance. */
+  height: calc(var(--photo-w) * 1.41);
   width: auto;
   max-width: 100%;
   margin: 0 auto;
-  aspect-ratio: 890 / 1184;
+  aspect-ratio: 2 / 3;
   grid-area: 1 / 1;
   object-fit: cover;
   object-position: center;
